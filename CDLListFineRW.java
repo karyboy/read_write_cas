@@ -28,37 +28,23 @@ public class CDLListFineRW<T> extends CDLList<T> {
 		}
 		
 		public void previous() {
-			try{
-				this.current.rw.lockRead();
-			}catch(InterruptedException e){
-				System.err.println(e.getMessage());
-			}
+			this.current.rw.lockRead();
 			
 			this.current=this.current.prev;
 			this.updateCurrent();
 			
-			try{
-				this.current.next.rw.unlockRead();
-			}catch(InterruptedException e){
-				System.err.println(e.getMessage());
-			}
+			this.current.next.rw.unlockRead();
+			
 		}
 		
 		public void next() {
-			try{
-				this.current.rw.lockRead();
-			}catch(InterruptedException e){
-				System.err.println(e.getMessage());
-			}
-				
-				this.current=this.current.next;
-				this.updateCurrent();
+			this.current.rw.lockRead();
 			
-			try{
-				this.current.prev.rw.unlockRead();
-			}catch(InterruptedException e){
-				System.err.println(e.getMessage());
-			}	
+			this.current=this.current.next;
+			this.updateCurrent();
+			
+			this.current.prev.rw.unlockRead();
+				
 		}
 
 		public void updateCurrent(){
@@ -82,33 +68,22 @@ public class CDLListFineRW<T> extends CDLList<T> {
 			while(this.current.next.lock_count>0 && this.current!=this.current.next && this.current.next!=this.current.prev)
 				;
 			
-			try{
-				this.current.rw.lockWrite();
-				this.current.lock_count++;
-			}catch(InterruptedException e){
-				System.err.println(e.getMessage());
-			}
+			this.current.rw.lockWrite();
+			this.current.lock_count++;
 					
 			while(this.current.prev.lock_count>0 && this.current!=this.current.next && this.current.next!=this.current.prev)
 				;
 
-			try{
-				if(this.current!=this.current.next ){
-					this.current.next.rw.lockWrite();
-					this.current.lock_count++;
-				}
-			}catch(InterruptedException e){
-				System.err.println(e.getMessage());
+			if(this.current!=this.current.next ){
+				this.current.next.rw.lockWrite();
+				this.current.lock_count++;
 			}
 			
-			try{
-				if(this.current!=this.current.prev && this.current.next!=this.current.prev){
+			if(this.current!=this.current.prev && this.current.next!=this.current.prev){
 				this.current.prev.rw.lockWrite();
 				this.current.lock_count++;
-				}
-			}catch(InterruptedException e){
-				System.err.println(e.getMessage());
 			}
+			
 					
 			Element ele = new Element(val,this.current,this.current.prev);
 			this.current.prev=ele;
@@ -116,23 +91,12 @@ public class CDLListFineRW<T> extends CDLList<T> {
 			this.current.lock_count=0;
 				
 			if(this.current!=this.current.prev && this.current.next!=this.current.prev)
-				try{
-					this.current.prev.prev.rw.unlockWrite();
-				}catch(InterruptedException e){
-					System.err.println(e.getMessage());
-				}
+				this.current.prev.prev.rw.unlockWrite();
 				
 			if(this.current!=this.current.next )
-				try{
-					this.current.next.rw.unlockWrite();
-				}catch(InterruptedException e){
-					System.err.println(e.getMessage());
-				}
-			try{
-				this.current.rw.unlockWrite();
-			}catch(InterruptedException e){
-				System.err.println(e.getMessage());
-			}
+				this.current.next.rw.unlockWrite();
+				
+			this.current.rw.unlockWrite();
 				
 			return true;
 			
@@ -144,33 +108,21 @@ public class CDLListFineRW<T> extends CDLList<T> {
 			while(this.current.next.lock_count>0 && this.current!=this.current.next && this.current.next!=this.current.prev)
 				;
 						
-			try{
-				this.current.rw.lockWrite();
-				this.current.lock_count++;
-			}catch(InterruptedException e){
-				System.err.println(e.getMessage());
-			}
+			this.current.rw.lockWrite();
+			this.current.lock_count++;
 				
 			
 			while(this.current.prev.lock_count>0 && this.current!=this.current.next && this.current.next!=this.current.prev)
 				;
 			
-			try{
-				if(this.current!=this.current.next ){
-					this.current.next.rw.lockWrite();
-					this.current.lock_count++;
-				}
-			}catch(InterruptedException e){
-				System.err.println(e.getMessage());
-			}		
+			if(this.current!=this.current.next ){
+				this.current.next.rw.lockWrite();
+				this.current.lock_count++;
+			}
 			
-			try{
-				if(this.current!=this.current.prev && this.current.next!=this.current.prev){
-					this.current.prev.rw.lockWrite();
-					this.current.lock_count++;
-				}
-			}catch(InterruptedException e){
-				System.err.println(e.getMessage());
+			if(this.current!=this.current.prev && this.current.next!=this.current.prev){
+				this.current.prev.rw.lockWrite();
+				this.current.lock_count++;
 			}
 			
 			Element ele = new Element(val,this.current.next,this.current);
@@ -179,24 +131,13 @@ public class CDLListFineRW<T> extends CDLList<T> {
 			this.current.lock_count=0;
 				
 			if(this.current!=this.current.prev && this.current.next!=this.current.prev)
-				try{
-					this.current.prev.rw.unlockWrite();
-				}catch(InterruptedException e){
-					System.err.println(e.getMessage());
-				}
+				this.current.prev.rw.unlockWrite();
 				
 			if(this.current!=this.current.next )
-				try{
-					this.current.next.next.rw.unlockWrite();
-				}catch(InterruptedException e){
-					System.err.println(e.getMessage());
-				}
-			try{
-				this.current.rw.unlockWrite();
-			}catch(InterruptedException e){
-				System.err.println(e.getMessage());
-			}
-		
+				this.current.next.next.rw.unlockWrite();
+			
+			this.current.rw.unlockWrite();
+			
 			return true;
 				
 		}

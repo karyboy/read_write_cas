@@ -33,37 +33,17 @@ public class CDLCoarseRW<T> extends CDLList<T> {
 		}
 		
 		public void previous() {
-			try{
-				CDLCoarseRW.this.rw.lockRead();
-			}
-			catch(InterruptedException e){
-				System.err.println(e.getMessage());
-			}
+			CDLCoarseRW.this.rw.lockRead();
 			this.current=this.current.prev;
 			this.updateCurrent();
-			try{
-				CDLCoarseRW.this.rw.unlockRead();
-			}
-			catch(InterruptedException e){
-				System.err.println(e.getMessage());
-			}
+			CDLCoarseRW.this.rw.unlockRead();
 		}
 		
 		public void next() {
-			try{
-				CDLCoarseRW.this.rw.lockRead();
-			}
-			catch(InterruptedException e){
-				System.err.println(e.getMessage());
-			}
+			CDLCoarseRW.this.rw.lockRead();
 			this.current=this.current.next;
 			this.updateCurrent();
-			try{
-				CDLCoarseRW.this.rw.unlockRead();
-			}
-			catch(InterruptedException e){
-				System.err.println(e.getMessage());
-			}
+			CDLCoarseRW.this.rw.unlockRead();
 		}
 
 		public void updateCurrent(){
@@ -83,44 +63,25 @@ public class CDLCoarseRW<T> extends CDLList<T> {
 		
 
 		public boolean insertBefore(T val) {
-			try{
-				CDLCoarseRW.this.rw.lockWrite();
-			}
-			catch(InterruptedException e){
-				System.err.println(e.getMessage());
-			}
+			CDLCoarseRW.this.rw.lockWrite();
 			
 			Element ele = new Element(val,this.current,this.current.prev);
 			this.current.prev=ele;
 			ele.prev.next=ele;
 			
-			try{
-				CDLCoarseRW.this.rw.unlockWrite();
-			}
-			catch(InterruptedException e){
-				System.err.println(e.getMessage());
-			}
+			CDLCoarseRW.this.rw.unlockWrite();
 			return true;
 		}
 		
 		public boolean insertAfter(T val) {
-			try{
-				CDLCoarseRW.this.rw.lockWrite();
-			}
-			catch(InterruptedException e){
-				System.err.println(e.getMessage());
-			}
+			CDLCoarseRW.this.rw.lockWrite();
 			
 			Element ele = new Element(val,this.current.next,this.current);
 			this.current.next=ele;
 			ele.next.prev=ele;
 			
-			try{
-				CDLCoarseRW.this.rw.unlockWrite();
-			}
-			catch(InterruptedException e){
-				System.err.println(e.getMessage());
-			}
+			CDLCoarseRW.this.rw.unlockWrite();
+			
 			return true;
 		}
 
