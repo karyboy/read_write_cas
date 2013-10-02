@@ -10,53 +10,65 @@ class RWLock{
 	
 	public void lockRead(){
 		//System.out.println("lock read");
-		while(this.lock.compareAndSet(1,2)==false || this.lock.get()<1){
-			//System.out.println("no read");
+		//int tmp=this.lock.get();
+		boolean b=false;
+		while((b=this.lock.compareAndSet(1,2))==false || this.lock.get()<1){
 			synchronized (this) {
 				try {
-					this.wait();
+					System.out.println("no read --"+ this.lock.get());
+					if(this.lock.get()!=1)
+						this.wait();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
 		}
-		//System.out.println("got lock");
-		if(this.lock.get()>2)
+		//System.out.println("got lock --"+this.lock.get());
+		if(b==false){
 			this.lock.incrementAndGet();
+			System.out.println("++++++++++++++++++++++++++++++++++++++++++++"+ this.lock.get());
+		}
 	}
 	
 	public void unlockRead(){
 		if (this.lock.get()>1){
-			int tmp=this.lock.decrementAndGet();
-			//System.out.println("greater than 1--"+tmp);
+			if(this.lock.decrementAndGet()==1){
+				this.lock.set(1);
+				synchronized (this) {
+					this.notifyAll();
+				}
+			}
+			//System.out.println("gt1 unlock read  --"+this.lock.get());
 		}
 		else if(this.lock.get()<-1){
-			//System.out.println("less than -1");
-			if(this.lock.incrementAndGet()==-1)
+			if(this.lock.incrementAndGet()==-1){
 				this.lock.set(1);
+				synchronized (this) {
+					this.notifyAll();
+				}
+			}
+			//System.out.println("lt1 unlock read  --"+this.lock.get());
 		}
 		else
-			//System.out.println("elsing");;//this.lock.set(1);
-		synchronized (this) {
-			this.notifyAll();
-		}
+			System.out.println("elsing");
 	}
 	
 	public void lockWrite(){
 		//System.out.println("lock write");
 		while(this.lock.compareAndSet(1,0)==false){
-			//System.out.println("no write --"+this.lock.get());
-			if(this.lock.get()>0)
+			System.out.println("no write --"+this.lock.get());
+			if(this.lock.get()>1)
 				this.lock.set(-1*this.lock.get());
 			synchronized (this) {
 				try {
-					this.wait();
+					if(this.lock.get()!=1)
+						this.wait();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
 		}
-		//System.out.println("got write");
+		//System.out.println("got write  "+this.lock.get());
 	}
 	
 	public void unlockWrite(){
