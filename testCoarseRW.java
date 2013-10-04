@@ -4,7 +4,7 @@ import java.util.List;
 import org.junit.Test;
 
 public class testCoarseRW{
-	@Test
+	//@Test
     public void test1(){
 //        USE THIS FOR COARSELIST AND FINELIST WITH MODIFICATIONS
         CDLCoarseRW<String> list = new CDLCoarseRW<String>("hi");
@@ -17,7 +17,7 @@ public class testCoarseRW{
         }
         
         List<Thread> threadList = new ArrayList<Thread>();
-        for (int i = 0; i < 55; i++) {
+        for (int i = 0; i < 5; i++) {
             NormalThreadrwc nt = new NormalThreadrwc(list, i);
             threadList.add(nt);
         }
@@ -36,10 +36,19 @@ public class testCoarseRW{
             System.err.println(e.getMessage());
             e.printStackTrace();
         }
+        
         list.print();
 //    YOU MAY WANT TO INCLUDE A PRINT METHOD TO VIEW ALL THE ELEMENTS
 //        list.print();
         
     }
+    @Test
+    public void testa(){
+    	for (int i=0;i<1000;i++){
+    		this.test1();
+    		System.out.println("====="+i);
+    	}
+    }
+    
 	
 }

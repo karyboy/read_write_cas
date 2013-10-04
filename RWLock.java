@@ -12,12 +12,13 @@ class RWLock{
 		//System.out.println("lock read");
 		int tmp=this.lock.get();
 		boolean b=false;
-		while((b=this.lock.compareAndSet(1,2))==false || this.lock.get()<1){
+		while((b=this.lock.compareAndSet(1,2))==false || (tmp=this.lock.get())<1){
 			synchronized (this) {
 				try {
-					System.out.println("no read --"+ this.lock.get());
-					if(this.lock.get()!=1)
+					if(this.lock.get()!=1){
+						System.out.println("no read --"+ this.lock.get());
 						this.wait();
+					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -25,7 +26,7 @@ class RWLock{
 		}
 		//System.out.println("got lock --"+this.lock.get());
 		if(b==false){
-			this.lock.incrementAndGet();
+			this.lock.compareAndSet(tmp, this.lock.get()+1);
 			System.out.println("++++++++++++++++++++++++++++++++++++++++++++"+ this.lock.get());
 		}
 	}
@@ -33,14 +34,17 @@ class RWLock{
 	public void unlockRead(){
 		int tmp,tmp1;
 		if ((tmp=this.lock.get())>1){
-			System.out.println("decing -- "+tmp);
-			
+			//System.out.println("decing -- "+tmp);
 			boolean ans=this.lock.compareAndSet(tmp,this.lock.get()-1);
-			System.out.println("decedd "+ans+" -- "+this.lock.get());
+			//if(ans==false)
+			//System.out.println("****************************"+ans+" -- "+this.lock.get());
 			if(this.lock.compareAndSet(1,1)){
 				synchronized (this) {
 					this.notifyAll();
 				}
+			}
+			else{
+				System.out.println("couldnt unlock +1 --"+this.lock.get());
 			}
 			//System.out.println("gt1 unlock read  --"+this.lock.get());
 		}
@@ -50,6 +54,9 @@ class RWLock{
 				synchronized (this) {
 					this.notifyAll();
 				}
+			}
+			else{
+				System.out.println("couldnt unlock  --"+this.lock.get());
 			}
 			//System.out.println("lt1 unlock read  --"+this.lock.get());
 		}
@@ -61,15 +68,16 @@ class RWLock{
 		int tmp;
 		while(this.lock.compareAndSet(1,0)==false){
 			if((tmp=this.lock.get())>1){
-				System.out.println("minusing -- "+this.lock.get());
+				//System.out.println("minusing -- "+this.lock.get());
 				this.lock.compareAndSet(tmp,-1*this.lock.get());
-				System.out.println("minused == "+this.lock.get());
+				//System.out.println("minused == "+this.lock.get());
 			}
 			synchronized (this) {
 				try {
-					System.out.println("no write --"+this.lock.get());
-					if(this.lock.get()!=1)
+					if(this.lock.get()!=1){
+						System.out.println("no write --"+this.lock.get());
 						this.wait();
+					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -82,7 +90,8 @@ class RWLock{
 		this.lock.set(1);
 		//System.out.println("unlock write");
 		synchronized (this) {
-			this.notifyAll();
+			if(this.lock.get()==1)
+				this.notifyAll();
 		}
 	}
 }
