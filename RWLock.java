@@ -1,5 +1,3 @@
-// Name - Karnesh Mehra
-// UB Mail - karneshm@buffalo.edu
 
 class RWLock{
 	private final java.util.concurrent.atomic.AtomicInteger lock;

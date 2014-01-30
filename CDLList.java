@@ -1,5 +1,3 @@
-// Name - Karnesh Mehra
-// UB Mail - karneshm@buffalo.edu
 
 public class CDLList<T> {
 
